@@ -30,7 +30,7 @@ async function run(){
 
 	details.map(function(d) {
 		upsert({
-			'event': d[0],
+			'eventName': d[0],
 			'date': d[1],
 			'game': d[2],
 		  'location': d[3]
@@ -41,7 +41,10 @@ async function run(){
 };
 
 function upsert(data) {
-	console.log(DB_URL);			
+	if(mongoose.connection.readyState == 0) {
+		mongoose.connect(DB_URL);
+	}
+
 };
 
 run();
