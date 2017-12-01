@@ -10,7 +10,8 @@
   "license": "WTFPL",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "mongoose": "^4.13.5",
+    "dateformat": "^3.0.2",
+    "mongoose": "^4.10.8",
     "puppeteer": "^0.13.0"
   }
 }

@@ -7,11 +7,12 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const mongoose = require('mongoose');
+const dateFormat = require('dateformat');
 mongoose.Promise = global.Promise;
-const mongo = require('mongodb').MongoClient;
+const Event = require('./models/event.js');
 const CREDS = require('./creds');
-const URL = "https://www.reddit.com/r/smashbros/wiki/events"
-const DB_URL = "mongodb://" + CREDS.username + ":" + CREDS.password + "@ds121456.mlab.com:21456/ecalo"
+const DB_URL = "mongodb://" + CREDS.username + ":" + CREDS.password + "@ds121456.mlab.com:21456/ecalo";
+const config = require('./config');
 
 async function run(){
   const browser = await puppeteer.launch({
@@ -19,7 +20,7 @@ async function run(){
 		slowMo: 0
 	});
   const page = await browser.newPage();
-  await page.goto(URL, {waitUntil: 'networkidle2'});
+  await page.goto(config.REDDIT_URL, {waitUntil: 'networkidle2'});
 
 	const EVENTS_TABLE = 'body > div.content > div > div > table:nth-child(6) > tbody';
 	const html = await page.content();	
@@ -28,12 +29,13 @@ async function run(){
 	var details = $(EVENTS_TABLE).find('tr').map(function(inx, thisRow) {
 		return [$(thisRow).text().trim().split('\n').slice(0,4)];
 	}).get();
-//	console.log(details);
 
 	details.map(function(d) {
+		dates = fixDate(d[1]);
 		upsert({
-			'eventName': d[0],
-			'date': d[1],
+			'name': d[0],
+			'startDate': dates[0],
+			'endDate': dates[1],
 			'game': d[2],
 		  'location': d[3]
 		});
@@ -42,35 +44,41 @@ async function run(){
   await browser.close();
 };
 
-function upsert(data) {
-	mongoose.connection.on("connected", function(ref) {
-		console.log("connected");
-	});
-
-	mongoose.connection.on("error", function(err) {
-		console.log(err);
-	});
-
-	mongoose.connection.on("disconnected", function() {
-		console.log("disconnected");
-	});
-
-	var gracefulExit = function() {
-		mongoose.connection.close(function () {
-			console.log("disconnected from node termination");
-			process.exit(0);
-		});
+// converts datestring to Date object. Optional pretty format commented out
+function fixDate(date) {
+	var dateinfo = date.split(' ');
+	var year = new Date().getFullYear();
+	var month = config.months[dateinfo[0].slice(0,3).toLowerCase()];
+	var day = dateinfo[1];
+	var startDate = new Date(year, month, day);
+	var endDate;
+	if (startDate.getTime() < new Date().getTime()) {
+		startDate.setFullYear(year + 1);
+	}
+	if (dateinfo.length > 2) {
+		endDate = new Date(year, month, dateinfo[3])
 	}
 
-	process.on('SIGINT', gracefulExit).on('SIGTERM', gracefulExit);
+	return [startDate, endDate];
 
-	try {
-		// options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
+	// prettyStart = dateFormat(startDate, "dddd, mmmm dS, yyyy");
+	// prettyEnd = dateFormat(endDate, "dddd, mmmm dS, yyyy");
+	// return [prettyStart, prettyEnd];
+
+}
+
+// insert or update events
+function upsert(eventObj) {
+	if (mongoose.connection.readyState == 0) {
 		mongoose.connect(DB_URL);
-		console.log("Trying to connect to DB");
-	} catch (err) {
-		console.log("Sever initialization failed " , err.message);
 	}
+
+	const conditions = { name: eventObj.name };
+	const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+	Event.findOneAndUpdate(conditions, eventObj, options).exec()
+		.then(function (result) { console.log("successfully inserted") })
+		.catch(function (err) { console.log(err.message) });
 }
 
 run();
