@@ -1,5 +1,6 @@
 {
 	"REDDIT_URL": "https://www.reddit.com/r/smashbros/wiki/events",
+	"HLTV_URL": "https://www.hltv.org/events",
 	"months" : {
 		"jan" : 0,
 		"feb": 1,
