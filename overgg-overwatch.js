@@ -15,8 +15,8 @@ const config = require('./config');
 
 async function run() {
   const browser = await puppeteer.launch({
-    headless: false,
-    slowMo: 500
+    headless: true,
+    slowMo: 0
   });
   const page = await browser.newPage();
   await page.goto(config.OVERWATCH_URL, {
@@ -41,6 +41,16 @@ async function run() {
       //'location': d[3]
     //});
   //});
+
+  const html = await page.content();
+  const $ = cheerio.load(html);
+
+  var details = $('#content > div:nth-child(2)').find('a.wf-card.event-card').map(function(inx, thisRow){
+    return [$(thisRow).text().replace(/\t/g,'').split('\n')];
+    }).get();
+
+  var detailsTrimmed = details.map(x => x.filter(Boolean));
+  console.log(detailsTrimmed);
 
   await browser.close();
 };
