@@ -55,6 +55,7 @@ async function run() {
 		
 
 		for (let i = 1; i <= bigEventLength; i++) {
+			// this can definitely be streamlined and I'll do that after being able to access small-event details
 			let base = 'body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events > a:nth-child(BIGEVENT)'.replace("MONTH", m).replace("BIGEVENT", i);
 			
 			let bigEventName = $(base + bigEventNameSelectorSuffix).text().trim();
