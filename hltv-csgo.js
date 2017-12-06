@@ -47,7 +47,6 @@ async function run() {
 		let eventLength = $(('body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events').replace("MONTH", m)).children().length;
 		let eventYear = $(eventYearSelector).text().replace(/[^0-9.]/g, "");
 		
-
 		for (let i = 1; i <= eventLength; i++) {
 			let base = 'body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events > a:nth-child(EVENT)'.replace("MONTH", m).replace("EVENT", i);
 		
