@@ -32,99 +32,78 @@ async function run() {
 	const html = await page.content();
 	const $ = cheerio.load(html);
 
-	//selector to access each month
-	const LENGTH_SELECTOR_CLASS = "div.events-holder div.events-month";
-
 	// how many months are displayed
-	let listLength = await $(html).find(LENGTH_SELECTOR_CLASS).length;
-
-	matchesInformation = [];
+	let listLength = await $(html).find("div.events-holder div.events-month").length;
 
 	//iterate through each div.events-month
 	for (let m = 1; m <= listLength; m++) {
-		//selectors with index replaced		
-		let bigEventNameSelectorSuffix = ' > div.big-event-info > div.info > div.big-event-name';
-		let bigEventLocationSelectorSuffix = ' > div.big-event-info > div.info > div.location-top-teams > div:nth-child(1) > span';
-		let bigEventStartDateSelectorSuffix = ' > div.big-event-info > div.additional-info > table > tbody > tr:nth-child(1) > td.col-value.col-date > span:nth-child(1)'
-		let bigEventEndDateSelectorSuffix = ' > div.big-event-info > div.additional-info > table > tbody > tr:nth-child(1) > td.col-value.col-date > span:nth-child(2)'
-
-		let bigEventLength = $('div.big-events').children().length;
+		//selectors for specific information within event
+		let eventNameSelector = ' > div.big-event-info > div.info > div.big-event-name';
+		let eventLocationSelector = ' > div.big-event-info > div.info > div.location-top-teams > div:nth-child(1) > span';
+		let eventStartDateSelector = ' > div.big-event-info > div.additional-info > table > tbody > tr:nth-child(1) > td.col-value.col-date > span:nth-child(1)'
+		let eventEndDateSelector = ' > div.big-event-info > div.additional-info > table > tbody > tr:nth-child(1) > td.col-value.col-date > span:nth-child(2)'
 		let eventYearSelector = ('body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.standard-headline').replace("MONTH", m);
-
+		
+		let eventLength = $(('body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events').replace("MONTH", m)).children().length;
 		let eventYear = $(eventYearSelector).text().replace(/[^0-9.]/g, "");
 		
 
-		for (let i = 1; i <= bigEventLength; i++) {
-			let base = 'body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events > a:nth-child(BIGEVENT)'.replace("MONTH", m).replace("BIGEVENT", i);
+		for (let i = 1; i <= eventLength; i++) {
+			let base = 'body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH) > div.big-events > a:nth-child(EVENT)'.replace("MONTH", m).replace("EVENT", i);
+		
+			let eventName = $(base + eventNameSelector).text().trim();
+			let eventLocation = $(base + eventLocationSelector).text().trim();
+			let eventStartDate = $(base + eventStartDateSelector).text().trim().replace("th", "");
+			let eventEndDate = $(base + eventEndDateSelector).text().trim().replace("- ","").replace("th","");
 			
-			let bigEventName = $(base + bigEventNameSelectorSuffix).text().trim();
-			bigEventName.length != 0 && console.log(bigEventName);
+			let game = 'CSGO';
 
-			let bigEventLocation = $(base + bigEventLocationSelectorSuffix).text().trim();
-			//bigEventLocation.length != 0 && console.log(bigEventLocation);
+			let validEvent = eventName.length != 0 && eventLocation.length != 0 && eventStartDate.length != 0 && eventEndDate.length != 0;
 
-			let bigEventStartDate = $(base + bigEventStartDateSelectorSuffix).text().trim().replace("th", "");
-			//bigEventStartDate.length != 0 && console.log(bigEventStartDate);
+			if  (validEvent) {
+				let details =  [eventName, fixDate(eventStartDate, eventYear), fixDate(eventEndDate, eventYear), game, eventLocation];
 
-			let bigEventEndDate = $(base + bigEventEndDateSelectorSuffix).text().trim().replace("- ","").replace("th","");
-			//bigEventEndDate.length != 0 && console.log(bigEventEndDate);
-
+			upsert({
+				name: details[0],
+				startDate: details[1],
+				endDate: details[2],
+				game: details[3],
+				location: details[4]
+			});
+			}
 		}
-
-		let smallEventNameSelectorSuffix = '';
-		let smallEventLocationSelectorSuffix = '';
-		let smallEventStartDateSelectorSuffix = '';
-		let smallEventEndDateSelectorSuffix = '';
-
-		let smallEventSelector = ('body > div.bgPadding > div > div.colCon > div.contentCol > div > div.events-holder > div:nth-child(MONTH)').replace("MONTH", m);
-		let smallEventLength = $(smallEventSelector).children('.small-event').length - 1;
-
-		for (let j = 1; j <= smallEventLength; j++) {
-
-		}
-
-		// let game = 'CSGO';
-
-		// let details = [eventName, eventStartDate, eventEndDate, game, eventLocation];
-		// matchesInformation.push(details);
 	}
 	await browser.close();
 }
-//create a map from details and upsert it
-// details.map(function(d) {
-// 	dates = fixDate(d[1]);
-// 	upsert({
-// 		'name': d[0],
-// 		'startDate': d[1],
-// 		'endDate': d[2],
-// 		'game': d[3],
-// 		'location': d[4]
-// 	});
-// });
 
-function fixDate(date, year) {}
+function fixDate(date, year) {
+	let day = ('0' + date.replace(/\D/g, '')).slice(-2);
+	let month = ('0' + (config.months[date.slice(0, 3).toLowerCase()] + 1)).slice(-2);
+	date = year + "-" + month + "-" + day + "T00:00:00.000Z";
+	return date
+}
 
-// function upsert(eventObj) {
-// 	if (mongoose.connection.readyState == 0) {
-// 		mongoose.connect(DB_URL);
-// 	}
+function upsert(eventObj) {
+	if (mongoose.connection.readyState == 0) {
+		mongoose.connect(DB_URL);
+	}
 
-// 	const conditions = {
-// 		name: eventObj.name
-// 	};
-// 	const options = {
-// 		upsert: true,
-// 		new: true,
-// 		setDefaultsOnInsert: true
-// 	};
+	const conditions = {
+		name: eventObj.name
+	};
+	const options = {
+		upsert: true,
+		new: true,
+		setDefaultsOnInsert: true
+	};
 
-// 	Event.findOneAndUpdate(conditions, eventObj, options).exec()
-// 		.then(function(result) {
-// 			console.log("successfully inserted")
-// 		})
-// 		.catch(function(err) {
-// 			console.log(err.message)
-// 		});
-// }
+	Event.findOneAndUpdate(conditions, eventObj, options).exec()
+		.then(function(result) {
+			console.log("successfully inserted")
+		})
+		.catch(function(err) {
+			console.log(err.message)
+		});
+}
 
 run();
