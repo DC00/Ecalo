@@ -45,17 +45,34 @@ async function run() {
   const html = await page.content();
   const $ = cheerio.load(html);
 
-  var details = $('#content > div:nth-child(2)').find('a.wf-card.event-card').map(function(inx, thisRow){
+  let details = $('#content > div:nth-child(2)').find('a.wf-card.event-card').map(function(inx, thisRow){
     return [$(thisRow).text().replace(/\t/g,'').split('\n')];
-    }).get();
+    }).get().map(x => x.filter(Boolean));
 
-  var detailsTrimmed = details.map(x => x.filter(Boolean));
-  console.log(detailsTrimmed);
-
+  //details.map(function(d) {
+    //upsert({
+      //'name': d[0],
+      //'startDate':
+      //'endDate':
+      //'game':'Overwatch'
+      //'location': d[2]
+    //});
+  }
   await browser.close();
 };
 
-// insert or update events
+// Fixing dates with Overwatch Events
+function fixDate(dateRange) {
+  return dateRange.map(function(n) {
+    var dateInfo = n.split(' ');
+    var month = config.months[dateInfo[0].slice(0,3).toLowerCase()];
+    var day = dateInfo[1].replace(/[^0-9]+/g, '');
+    var year = (dateInfo.length > 2) ? dateInfo[2] : new Date().getFullYear();
+    return new Date(month, day, year);
+  }
+}
+
+// Insert or update events
 function upsert(eventObj) {
   if (mongoose.connection.readyState == 0) {
     mongoose.connect(DB_URL);
