@@ -78,7 +78,7 @@ async function run() {
 function fixDate(date, year) {
 	let day = ('0' + date.replace(/\D/g, '')).slice(-2);
 	let month = ('0' + (config.months[date.slice(0, 3).toLowerCase()] + 1)).slice(-2);
-	date = year + "-" + month + "-" + day + "T00:00:00.000Z";
+	date = new Date(year, month, day);
 	return date
 }
 
