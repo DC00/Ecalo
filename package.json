@@ -9,8 +9,10 @@
   "author": "Daniel Coo",
   "license": "WTFPL",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
     "dateformat": "^3.0.2",
+    "express": "^4.16.2",
     "mongoose": "^4.10.8",
     "puppeteer": "^0.13.0"
   }
