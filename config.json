@@ -1,6 +1,8 @@
 {
 	"REDDIT_URL": "https://www.reddit.com/r/smashbros/wiki/events",
-  "OVERWATCH_URL":"https://www.over.gg/events",
+	"HLTV_URL": "https://www.hltv.org/events",
+  	"OVERWATCH_URL":"https://www.over.gg/events",
+
 	"months" : {
 		"jan" : 0,
 		"feb": 1,
