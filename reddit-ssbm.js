@@ -38,7 +38,7 @@ async function run() {
       'name': d[0],
       'startDate': dates[0],
       'endDate': dates[1],
-      'game': d[2],
+      'game': d[2].replace(/\s/g, '').toLowerCase(),
       'location': d[3]
     });
   });

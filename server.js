@@ -1,20 +1,13 @@
 var express = require('express'),
     config  = require('./config'),
-    fs      = require('fs'),
     path    = require('path'),
-    app     = express();
+    port    = process.env.PORT || config.PORT,
+    app     = require('./app');
 
-var router = express.Router();
-
-// Routes
-router.get('/', function (req, res) {
-  res.json({message: 'welcome to ecalo'});
-})
-
-app.use('/api', router);
-
+const CREDS = require('./creds');
+const DB_URL  = "mongodb://" + CREDS.username + ":" + CREDS.password + "@ds121456.mlab.com:21456/ecalo"
 
 // Listen on env port or set port 3000
-app.listen(process.env.PORT || config.PORT, function() {
+var server = app.listen(port, function() {
   console.log("ecalo magic on port ", config.PORT);
 })
