@@ -20,7 +20,7 @@ class App extends Component {
       <div>
       <BigCalendar
         events={this.state.events}
-        views={['month', 'week']}
+        views={['month', 'week', 'agenda']}
         defaultDate={new Date(2017, 12, 9)}
       />
       </div>
