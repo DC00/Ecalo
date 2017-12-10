@@ -5,6 +5,10 @@
   "engines": {
     "node": "6.11.x"
   },
+  "cacheDirectories": [
+    "node_modules",
+    "ecalo/node_modules"
+  ],
   "scripts": {
     "start": "node server",
     "heroku-postbuild": "cd ecalo/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"

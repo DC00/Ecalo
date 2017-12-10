@@ -8,10 +8,10 @@ const cheerio = require('cheerio');
 const mongoose = require('mongoose');
 const dateFormat = require('dateformat');
 mongoose.Promise = global.Promise;
-const Event = require('./models/event.js');
-const CREDS = require('./creds');
+const Event = require('../events/event.js');
+const CREDS = require('../creds');
 const DB_URL = "mongodb://" + CREDS.username + ":" + CREDS.password + "@ds121456.mlab.com:21456/ecalo";
-const config = require('./config');
+const config = require('../config');
 
 // Main function that performs the scraping and inserting into the db
 async function run() {

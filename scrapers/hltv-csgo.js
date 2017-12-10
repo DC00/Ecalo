@@ -8,15 +8,10 @@ const cheerio = require("cheerio");
 const mongoose = require("mongoose");
 const dateFormat = require("dateFormat");
 mongoose.Promise = global.Promise;
-const Event = require("./models/event.js");
-const CREDS = require("./creds");
-const DB_URL =
-	"mongodb://" +
-	CREDS.username +
-	":" +
-	CREDS.password +
-	"@ds121456.mlab.com:21456/ecalo";
-const config = require("./config");
+const Event = require("../events/event.js");
+const CREDS = require("../creds");
+const DB_URL = "mongodb://" + CREDS.username + ":" + CREDS.password + "@ds121456.mlab.com:21456/ecalo";
+const config = require("../config");
 
 async function run() {
 	const browser = await puppeteer.launch({
@@ -55,7 +50,7 @@ async function run() {
 			let eventStartDate = $(base + eventStartDateSelector).text().trim().replace("th", "");
 			let eventEndDate = $(base + eventEndDateSelector).text().trim().replace("- ","").replace("th","");
 			
-			let game = 'CSGO';
+			let game = 'csgo';
 
 			let validEvent = eventName.length != 0 && eventLocation.length != 0 && eventStartDate.length != 0 && eventEndDate.length != 0;
 
