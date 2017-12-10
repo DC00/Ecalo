@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 let eventSchema = new mongoose.Schema({
-	name: String,
-	startDate: Date,
-	endDate: Date,
+	title: String,
+	start: Date,
+	end: Date,
 	game: String,
 	location: String
 });

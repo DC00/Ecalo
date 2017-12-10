@@ -63,9 +63,9 @@ async function run() {
 				let details =  [eventName, fixDate(eventStartDate, eventYear), fixDate(eventEndDate, eventYear), game, eventLocation];
 
 			upsert({
-				name: details[0],
-				startDate: details[1],
-				endDate: details[2],
+				title: details[0],
+				start: details[1],
+				end: details[2],
 				game: details[3],
 				location: details[4]
 			});
@@ -88,7 +88,7 @@ function upsert(eventObj) {
 	}
 
 	const conditions = {
-		name: eventObj.name
+		title: eventObj.title
 	};
 	const options = {
 		upsert: true,

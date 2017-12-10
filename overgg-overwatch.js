@@ -36,9 +36,9 @@ async function run() {
   details.map(function(d) {
     dates = fixDate([d[3],d[4]])
     upsert({
-      'name': d[0],
-      'startDate':dates[0],
-      'endDate':dates[1],
+      'title': d[0],
+      'start':dates[0],
+      'end':dates[1],
       'game':'Overwatch',
       'location': d[2]
     });
@@ -65,7 +65,7 @@ function upsert(eventObj) {
   }
 
   const conditions = {
-    name: eventObj.name
+    title: eventObj.title
   };
   const options = {
     upsert: true,

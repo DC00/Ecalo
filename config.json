@@ -1,7 +1,7 @@
 {
 	"REDDIT_URL": "https://www.reddit.com/r/smashbros/wiki/events",
 	"HLTV_URL": "https://www.hltv.org/events",
-  "OVERWATCH_URL":"https://www.over.gg/events",
+  	"OVERWATCH_URL":"https://www.over.gg/events",
 
 	"months" : {
 		"jan" : 0,
@@ -17,5 +17,5 @@
 		"nov": 10,
 		"dec": 11
 	},
-	"PORT": 3000
+	"PORT": 3001
 }
