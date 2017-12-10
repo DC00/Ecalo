@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "engines": {
-    "node": "6.11.x"
+    "node": "6.11.x",
+    "npm": "5.5.1"
   },
   "cacheDirectories": [
     "node_modules",
