@@ -1,0 +1,27 @@
+html {
+	text-align: center;
+	width: 100%;
+}
+
+body {
+	width: 90%;
+	display: inline-block;
+	margin: 10px auto;
+}
+
+.rbc-month-row {
+	height: 80px;
+}
+
+.rbc-event {
+	margin: 4px 4px;
+	transition: 0.2s background-color;
+}
+
+.rbc-event:hover {
+	background-color: #107DDC;
+}
+
+.rbc-toolbar-label {
+	font-weight: bold;
+}
